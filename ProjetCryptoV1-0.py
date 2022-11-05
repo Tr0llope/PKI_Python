@@ -1,3 +1,9 @@
+#Cryptographie appliquée
+#Projet n°2: PKI et Python
+#Auteur: Guillaume Paris
+#Date: 07-11-2022
+#Description: Ce programme permet de créer une autorité de certification, de créer des certificats et de les signer.
+
 import datetime
 import os
 from cryptography.hazmat.backends import default_backend
@@ -9,13 +15,11 @@ from cryptography.hazmat.primitives import hashes
 
 
 #Choisr l'algorithme de signature
-signature=input("Choisir l'algorithme de signature: 1 pour SHA1, 2 pour SHA256\n") #, 3 pour SHA512
+signature=input("Choisir l'algorithme de signature: 1 pour SHA1, 2 pour SHA256\n")
 if signature=="1":
     signature=hashes.SHA1()
 elif signature=="2":
     signature=hashes.SHA256()
-# elif signature=="3":
-#     signature=hashes.SHA512()
 else:
     print("Erreur de saisie")
     exit()
@@ -41,7 +45,7 @@ csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
     x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"groupe ESIEA"),
     x509.NameAttribute(NameOID.COMMON_NAME, u"esiea.com"),
 ])).sign(key, signature, default_backend())
-with open("csr.pem", "wb") as f:
+with open("autorite_enregistrement.pem", "wb") as f:
     f.write(csr.public_bytes(serialization.Encoding.PEM))
 
 
@@ -49,7 +53,7 @@ with open("csr.pem", "wb") as f:
 if not os.path.exists("autorite_racine"):
     os.makedirs("autorite_racine")
 
-    with open("autorite_racine/key.pem", "wb") as f:
+    with open("autorite_racine/private_key.pem", "wb") as f:
             f.write(key.private_bytes( encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.TraditionalOpenSSL, 
             encryption_algorithm=serialization.NoEncryption()))
@@ -61,9 +65,9 @@ else:
     print("L'autorité racine existe déjà")
 
 #Signer les certificats générés par l’autorité d’enregistrement
-with open("csr.pem", "rb") as f:
+with open("autorite_enregistrement.pem", "rb") as f:
     csr = x509.load_pem_x509_csr(f.read(), default_backend())
-with open("rsaKeys/private_key.pem", "rb") as f:
+with open("autorite_racine/private_key.pem", "rb") as f:
     private_key = serialization.load_pem_private_key(
         f.read(),
         password=None,
@@ -77,8 +81,8 @@ certificate = x509.CertificateBuilder().subject_name(
         x509.NameAttribute(NameOID.COUNTRY_NAME, u"FR"),
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Ile de France"),
         x509.NameAttribute(NameOID.LOCALITY_NAME, u"Paris"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"groupe ESIEA"),
-        x509.NameAttribute(NameOID.COMMON_NAME, u"esiea.com"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"ESIEA"),
+        x509.NameAttribute(NameOID.COMMON_NAME, u"service informatique"),
     ])
 ).public_key(
     csr.public_key()
@@ -89,11 +93,11 @@ certificate = x509.CertificateBuilder().subject_name(
 ).not_valid_after(
     datetime.datetime.utcnow() + datetime.timedelta(days=10)
 ).sign(private_key, signature, default_backend())
-with open("certificate.pem", "wb") as f:
+with open("certificat.pem", "wb") as f:
     f.write(certificate.public_bytes(serialization.Encoding.PEM))
 
 #Parser le certificat
-with open("certificate.pem", "rb") as f:
+with open("certificat.pem", "rb") as f:
     certificate = x509.load_pem_x509_certificate(f.read(), default_backend())
 
 print("Emeteur: {}".format(certificate.issuer)) 
