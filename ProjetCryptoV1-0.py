@@ -9,13 +9,13 @@ from cryptography.hazmat.primitives import hashes
 
 
 #Choisr l'algorithme de signature
-signature=input("Choisir l'algorithme de signature: 1 pour SHA1, 2 pour SHA256, 3 pour SHA512\n")
+signature=input("Choisir l'algorithme de signature: 1 pour SHA1, 2 pour SHA256\n") #, 3 pour SHA512
 if signature=="1":
     signature=hashes.SHA1()
 elif signature=="2":
     signature=hashes.SHA256()
-elif signature=="3":
-    signature=hashes.SHA512()
+# elif signature=="3":
+#     signature=hashes.SHA512()
 else:
     print("Erreur de saisie")
     exit()
