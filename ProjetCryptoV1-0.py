@@ -6,7 +6,6 @@
 
 import datetime
 import os
-#from tkinter.ttk import _Padding
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
