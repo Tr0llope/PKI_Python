@@ -2,7 +2,7 @@
 #Projet n°2: PKI et Python
 #Auteur: Guillaume Paris
 #Date: 07-11-2022
-#Description: Ce programme permet de créer une autorité de certification, de créer des certificats et de les signer.
+#Description: Ce programme permet de créer une autorité racine, une autorité d'enregistrement et un certificat client signé par l'autorité racine et l'autorité d'enregistrement.
 
 import datetime
 import os
